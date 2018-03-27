@@ -509,11 +509,7 @@ void ucoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			else
 				SP[i][J] = 0.;
             
-            /* u can be fixed to zero by setting SP to a very large value */
-
-			if (i > 3*NPI/5 && i < 4*NPI/5 && J > NPJ/3 && J < 2*NPJ/3)
-				SP[i][J] = -LARGE; 
-				Su[i][J] = 0.0; 
+            
 
             
             
@@ -522,6 +518,25 @@ void ucoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
                        2./3. * (rho[I][J]*k[I][J] - rho[I-1][J]*k[I-1][J])/(x[I] - x[I-1]);
 			Su[I][j] *= AREAw*AREAs;
 			
+			/* u can be fixed to zero by setting SP to a very large value */
+			
+			if (i > 0.15*NPI && i < 0.20*NPI && J == 20*NPJ/40 )
+				SP[i][J] = -LARGE;
+			
+			if (i > 0.2*NPI && i < 0.25*NPI && J > 19*NPJ/40 && J <= 21*NPJ/40)
+				SP[i][J] = -LARGE; 
+				//Su[i][J] = 0.0;			 
+				
+			if (i >= 0.25*NPI && i < 0.3*NPI && J > 18*NPJ/40 && J <= 22*NPJ/40)
+				SP[i][J] = -LARGE; 
+				
+			if (i >= 0.3*NPI && i < 0.35*NPI && J > 17*NPJ/40 && J <= 23*NPJ/40)
+				SP[i][J] = -LARGE; 
+			
+			if (i >= 0.35*NPI && i < 0.75*NPI && J > 16*NPJ/40 && J <= 24*NPJ/40)
+				SP[i][J] = -LARGE; 
+				
+				
 			/* The coefficients (hybrid differencing scheme) */
 
 			aW[i][J] = max3( Fw, Dw + 0.5*Fw, 0.);
@@ -624,11 +639,24 @@ void vcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 
 			Su[I][j] *= AREAw*AREAs;
 			
-			/* setting u to zero */ 
+			/* v can be fixed to zero by setting SP to a very large value */
 			
-			if (i > 3*NPI/5 && i < 4*NPI/5 && J > NPJ/3 && J < 2*NPJ/3)
+			if (i > 0.15*NPI && i < 0.20*NPI && J == 20*NPJ/40 )
+				SP[i][J] = -LARGE;
+			
+			if (i > 0.2*NPI && i < 0.25*NPI && J > 19*NPJ/40 && J <= 21*NPJ/40)
 				SP[i][J] = -LARGE; 
-				Su[i][J] = 0.0;			 
+				//Su[i][J] = 0.0;			 
+				
+			if (i >= 0.25*NPI && i < 0.3*NPI && J > 18*NPJ/40 && J <= 22*NPJ/40)
+				SP[i][J] = -LARGE; 
+				
+			if (i >= 0.3*NPI && i < 0.35*NPI && J > 17*NPJ/40 && J <= 23*NPJ/40)
+				SP[i][J] = -LARGE; 
+			
+			if (i >= 0.35*NPI && i < 0.75*NPI && J > 16*NPJ/40 && J <= 24*NPJ/40)
+				SP[i][J] = -LARGE; 
+				
 
 
 			/* The coefficients (hybrid differencing scheme) */
