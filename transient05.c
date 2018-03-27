@@ -509,12 +509,20 @@ void ucoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			else
 				SP[i][J] = 0.;
             
+            /* u can be fixed to zero by setting SP to a very large value */
+
+			if (i > 3*NPI/5 && i < 4*NPI/5 && J > NPJ/3 && J < 2*NPJ/3)
+				SP[i][J] = -LARGE; 
+				Su[i][J] = 0.0; 
+
+            
+            
 			Su[i][J] = (mueff[I][J]*dudx[I][J] - mueff[I-1][J]*dudx[I-1][J]) / (x[I] - x[I-1]) + 
 			           (mun        *dvdx[i][j+1] - mus        *dvdx[i][j]) / (y_v[j+1] - y_v[j]) -
                        2./3. * (rho[I][J]*k[I][J] - rho[I-1][J]*k[I-1][J])/(x[I] - x[I-1]);
 			Su[I][j] *= AREAw*AREAs;
 			
-			/* The coefficients (hybrid differencing sheme) */
+			/* The coefficients (hybrid differencing scheme) */
 
 			aW[i][J] = max3( Fw, Dw + 0.5*Fw, 0.);
 			aE[i][J] = max3(-Fe, De - 0.5*Fe, 0.);
@@ -615,6 +623,13 @@ void vcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
                        2./3. * (rho[I][J]*k[I][J] - rho[I][J-1]*k[I][J-1])/(y[J] - y[J-1]); 
 
 			Su[I][j] *= AREAw*AREAs;
+			
+			/* setting u to zero */ 
+			
+			if (i > 3*NPI/5 && i < 4*NPI/5 && J > NPJ/3 && J < 2*NPJ/3)
+				SP[i][J] = -LARGE; 
+				Su[i][J] = 0.0;			 
+
 
 			/* The coefficients (hybrid differencing scheme) */
 
@@ -623,7 +638,16 @@ void vcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			aS[I][j] = max3( Fs, Ds + 0.5*Fs, 0.);
 			aN[I][j] = max3(-Fn, Dn - 0.5*Fn, 0.);
 			aPold    = 0.5*(rho[I][J-1] + rho[I][J])*AREAe*AREAn/Dt;
+			
+			/* transport of v through the baffles can be switched off by setting the coefficients to zero */
+/*
+			if (I == 3*NPI/5 && j > 2*NPJ/3)   /* left of baffle 
+				aE[I][j] = 0;
 
+			if (I == 4*NPI/5 && j > 2*NPJ/3) /* right of baffle 
+				aW[I][j] = 0; 
+
+*/
 			/* eq. 8.31 without time dependent terms (see also eq. 5.14): */
 
 			aP[I][j] = aW[I][j] + aE[I][j] + aS[I][j] + aN[I][j] + Fe - Fw + Fn - Fs - SP[I][J] + aPold;
