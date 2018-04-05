@@ -509,11 +509,7 @@ void ucoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			else
 				SP[i][J] = 0.;
             
-            /* u can be fixed to zero by setting SP to a very large value */
-
-			if (i > 3*NPI/5 && i < 4*NPI/5 && J > NPJ/3 && J < 2*NPJ/3)
-				SP[i][J] = -LARGE; 
-				Su[i][J] = 0.0; 
+            
 
             
             
@@ -522,6 +518,74 @@ void ucoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
                        2./3. * (rho[I][J]*k[I][J] - rho[I-1][J]*k[I-1][J])/(x[I] - x[I-1]);
 			Su[I][j] *= AREAw*AREAs;
 			
+			/* u can be fixed to zero by setting SP to a very large value */
+			
+			/*
+			if (i > 0.15*NPI && i < 0.20*NPI && J == 0.5*NPJ )
+				SP[i][J] = -LARGE;
+			
+			if (i > 0.20*NPI && i < 0.25*NPI && J > 39*NPJ/80 && J <= 41*NPJ/80)
+				SP[i][J] = -LARGE; 
+				//Su[i][J] = 0.0;			 
+				
+			if (i >= 0.25*NPI && i < 0.3*NPI && J > 38*NPJ/80 && J <= 42*NPJ/80)
+				SP[i][J] = -LARGE; 
+				
+			if (i >= 0.3*NPI && i < 0.35*NPI && J > 37*NPJ/80 && J <= 43*NPJ/80)
+				SP[i][J] = -LARGE; 
+			
+			if (i >= 0.35*NPI && i < 0.75*NPI && J > 36*NPJ/80 && J <= 44*NPJ/80)
+				SP[i][J] = -LARGE; */
+				
+			/*
+			if (i > 0.10*NPI && i < 0.10*NPI + 1 && J == 0.2*NPJ )
+				SP[i][J] = -LARGE;
+			
+			if (i >= 0.10*NPI + 1 && i < 0.10*NPI + 2 && J > 0.2*NPJ - 1 && J <= 0.2*NPJ + 1)
+				SP[i][J] = -LARGE; 
+							 
+			if (i >= 0.10*NPI + 2 && i < 0.10*NPI + 3 && J > 0.2*NPJ - 2 && J <= 0.2*NPJ + 2)
+				SP[i][J] = -LARGE;
+							  
+			if (i >= 0.10*NPI + 3 && i < 0.10*NPI + 4 && J > 0.2*NPJ - 3 && J <= 0.2*NPJ + 3)
+				SP[i][J] = -LARGE;
+			
+			if (i >= 0.10*NPI + 4 && i < 0.10*NPI + 5 && J > 0.2*NPJ - 4 && J <= 0.2*NPJ + 4)
+				SP[i][J] = -LARGE;
+				
+			if (i >= 0.10*NPI + 5 && i < 0.65*NPI && J > 0.2*NPJ - 4 && J <= 0.2*NPJ + 4)
+				SP[i][J] = -LARGE;  */
+				
+				
+			
+			if (i > 0.10*NPI && i < 0.10*NPI + 1 && J == 0.5*NPJ )
+				SP[i][J] = -LARGE;
+			
+			if (i >= 0.10*NPI + 1 && i < 0.10*NPI + 2 && J > 0.5*NPJ - 1 && J <= 0.5*NPJ + 1)
+				SP[i][J] = -LARGE; 
+							 
+			if (i >= 0.10*NPI + 2 && i < 0.10*NPI + 3 && J > 0.5*NPJ - 2 && J <= 0.5*NPJ + 2)
+				SP[i][J] = -LARGE;
+							  
+			if (i >= 0.10*NPI + 3 && i < 0.10*NPI + 4 && J > 0.5*NPJ - 3 && J <= 0.5*NPJ + 3)
+				SP[i][J] = -LARGE;
+			
+			if (i >= 0.10*NPI + 4 && i < 0.10*NPI + 5 && J > 0.5*NPJ - 4 && J <= 0.5*NPJ + 4)
+				SP[i][J] = -LARGE; 
+				
+			if (i >= 0.10*NPI + 5 && i < 0.10*NPI + 6 && J > 0.5*NPJ - 5 && J <= 0.5*NPJ + 5)
+				SP[i][J] = -LARGE; 
+			
+			if (i >= 0.10*NPI + 6 && i < 0.10*NPI + 7 && J > 0.5*NPJ - 6 && J <= 0.5*NPJ + 6)
+				SP[i][J] = -LARGE; 	
+			
+			if (i >= 0.10*NPI + 7 && i < 0.10*NPI + 8 && J > 0.5*NPJ - 7 && J <= 0.5*NPJ + 7)
+				SP[i][J] = -LARGE; 
+			
+			if (i >= 0.10*NPI + 8 && i < 0.10*NPI + 13 && J > 0.5*NPJ - 8 && J <= 0.5*NPJ + 8)
+				SP[i][J] = -LARGE;   
+			
+				
 			/* The coefficients (hybrid differencing scheme) */
 
 			aW[i][J] = max3( Fw, Dw + 0.5*Fw, 0.);
@@ -624,11 +688,71 @@ void vcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 
 			Su[I][j] *= AREAw*AREAs;
 			
-			/* setting u to zero */ 
+			/* v can be fixed to zero by setting SP to a very large value */
 			
-			if (i > 3*NPI/5 && i < 4*NPI/5 && J > NPJ/3 && J < 2*NPJ/3)
+			/*
+			if (i > 0.15*NPI && i < 0.20*NPI && J == 0.5*NPJ )
+				SP[i][J] = -LARGE;
+			
+			if (i > 0.2*NPI && i < 0.25*NPI && J > 39*NPJ/80 && J <= 41*NPJ/80)
 				SP[i][J] = -LARGE; 
-				Su[i][J] = 0.0;			 
+				//Su[i][J] = 0.0;			 
+				
+			if (i >= 0.25*NPI && i < 0.3*NPI && J > 38*NPJ/80 && J <= 42*NPJ/80)
+				SP[i][J] = -LARGE; 
+				
+			if (i >= 0.3*NPI && i < 0.35*NPI && J > 37*NPJ/80 && J <= 43*NPJ/80)
+				SP[i][J] = -LARGE; 
+			
+			if (i >= 0.35*NPI && i < 0.75*NPI && J > 36*NPJ/80 && J <= 44*NPJ/80)
+				SP[i][J] = -LARGE; 
+				
+				
+			if (i > 0.10*NPI && i < 0.10*NPI + 1 && J == 0.2*NPJ )
+				SP[i][J] = -LARGE;
+			
+			if (i >= 0.10*NPI + 1 && i < 0.10*NPI + 2 && J > 0.2*NPJ - 1 && J <= 0.2*NPJ + 1)
+				SP[i][J] = -LARGE; 
+							 
+			if (i >= 0.10*NPI + 2 && i < 0.10*NPI + 3 && J > 0.2*NPJ - 2 && J <= 0.2*NPJ + 2)
+				SP[i][J] = -LARGE;
+							  
+			if (i >= 0.10*NPI + 3 && i < 0.10*NPI + 4 && J > 0.2*NPJ - 3 && J <= 0.2*NPJ + 3)
+				SP[i][J] = -LARGE;
+			
+			if (i >= 0.10*NPI + 4 && i < 0.10*NPI + 5 && J > 0.2*NPJ - 4 && J <= 0.2*NPJ + 4)
+				SP[i][J] = -LARGE;
+				
+			if (i >= 0.10*NPI + 5 && i < 0.65*NPI && J > 0.2*NPJ - 4 && J <= 0.2*NPJ + 4)
+				SP[i][J] = -LARGE; */
+			
+			
+			if (i > 0.10*NPI && i < 0.10*NPI + 1 && J == 0.5*NPJ )
+				SP[i][J] = -LARGE;
+			
+			if (i >= 0.10*NPI + 1 && i < 0.10*NPI + 2 && J > 0.5*NPJ - 1 && J <= 0.5*NPJ + 1)
+				SP[i][J] = -LARGE; 
+							 
+			if (i >= 0.10*NPI + 2 && i < 0.10*NPI + 3 && J > 0.5*NPJ - 2 && J <= 0.5*NPJ + 2)
+				SP[i][J] = -LARGE;
+							  
+			if (i >= 0.10*NPI + 3 && i < 0.10*NPI + 4 && J > 0.5*NPJ - 3 && J <= 0.5*NPJ + 3)
+				SP[i][J] = -LARGE;
+			
+			if (i >= 0.10*NPI + 4 && i < 0.10*NPI + 5 && J > 0.5*NPJ - 4 && J <= 0.5*NPJ + 4)
+				SP[i][J] = -LARGE; 
+				
+			if (i >= 0.10*NPI + 5 && i < 0.10*NPI + 6 && J > 0.5*NPJ - 5 && J <= 0.5*NPJ + 5)
+				SP[i][J] = -LARGE; 
+			
+			if (i >= 0.10*NPI + 6 && i < 0.10*NPI + 7 && J > 0.5*NPJ - 6 && J <= 0.5*NPJ + 6)
+				SP[i][J] = -LARGE; 	
+			
+			if (i >= 0.10*NPI + 7 && i < 0.10*NPI + 8 && J > 0.5*NPJ - 7 && J <= 0.5*NPJ + 7)
+				SP[i][J] = -LARGE; 
+			
+			if (i >= 0.10*NPI + 8 && i < 0.10*NPI + 13 && J > 0.5*NPJ - 8 && J <= 0.5*NPJ + 8)
+				SP[i][J] = -LARGE;   
 
 
 			/* The coefficients (hybrid differencing scheme) */
