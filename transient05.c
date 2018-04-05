@@ -1,4 +1,4 @@
-/***** Solves: Unsteady, compressible convection-diffusion problems.
+ /***** Solves: Unsteady, compressible convection-diffusion problems.
 
 ****** Description:
 ****** This program solves unsteady convection-diffusion problems	
