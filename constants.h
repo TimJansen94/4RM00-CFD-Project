@@ -1,7 +1,7 @@
 #define NPI        40        /* number of grid cells in x-direction [-] */
-#define NPJ        80        /* number of grid cells in y-direction [-] */
-#define XMAX       10.0      /* width of the domain [m] */ 
-#define YMAX       4.0       /* height of the domain [m] */
+#define NPJ        40        /* number of grid cells in y-direction [-] */
+#define XMAX       20.0      /* width of the domain [m] */ 
+#define YMAX       8.0       /* height of the domain [m] */
 #define PI         3.1415927 /* value of pi [-] */
 #define MAX_ITER   100       /* maximum number of outer iterations [-] */
 #define U_ITER     1         /* number of Newton iterations for u equation [-] */
