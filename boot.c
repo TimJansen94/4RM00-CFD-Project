@@ -679,12 +679,12 @@ void vcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			
 			/* v can be fixed to zero by setting SP to a very large value */
 			
-			if (i > b_ship + count1 && i <= b_ship + (count1+1) && J >= 0.5*NPJ - count2 && J <= 0.5*NPJ + count2)
-				SP[i][J] = -LARGE;
+			if (I > b_ship + count1 && I <= b_ship + (count1+1) && j >= 0.5*NPJ - count2 && j <= 0.5*NPJ + count2)
+				SP[I][j] = -LARGE;
 				
 				
-			if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && J >= 0.5*NPJ - count2 && J <= 0.5*NPJ + count2 )
-				SP[i][J] = -LARGE; 
+			if (I > b_ship + (countmax+1) && I <= b_ship + (countmax+1) + l_ship  && j >= 0.5*NPJ - count2 && j <= 0.5*NPJ + count2 )
+				SP[I][j] = -LARGE; 
 			
 				
 
@@ -1178,28 +1178,28 @@ void calculateuplus(void)
 			j = J;
 			// for yplus and uplus calculations
 			if (yplus3[I][J] < 11.63) {
-                  twx[I][J]     = mu[I][J]*0.5*(u[i][J]+u[i+1][J])/(y[J+1] - y_v[j]);
-                  yplus3[I][J]  = sqrt(rho[I][J] * fabs(twx[I][J])) * (y[J+1] - y_v[j]) / mu[I][J];
+                  twx[I][J]     = mu[I][J]*0.5*(u[i][J]+u[i+1][J])/(y[J] - y_v[j]);
+                  yplus3[I][J]  = sqrt(rho[I][J] * fabs(twx[I][J])) * (y[J] - y_v[j]) / mu[I][J];
                   yplus[I][J]   = yplus3[I][J];
                   uplus[I][J]   = yplus[I][J];
             }/* if */
             else {
                   twx[I][J]     = rho[I][J]*pow(Cmu,0.25)*sqrt(k[I][J])*0.5*(u[i][J]+u[i+1][J])/uplus[I][J];
-                  yplus3[I][J]  = sqrt(rho[I][J] * fabs(twx[I][J])) * (y[J+1] - y_v[j]) / mu[I][J];
+                  yplus3[I][J]  = sqrt(rho[I][J] * fabs(twx[I][J])) * (y[J] - y_v[j]) / mu[I][J];
                   yplus [I][J]  = yplus3[I][J];
                   uplus [I][J]  = log(ERough*yplus[I][J])/kappa;
             }/* else */
             
             //for xplus and vplus calulations
             if (xplus3[I][J] < 11.63) {
-                  twy[I][J]     = mu[I][J]*0.5*(v[I][j]+v[I+1][j])/(x[I+1] - x_u[i]);
-                  xplus3[I][J]  = sqrt(rho[I][J] * fabs(twy[I][J])) * (x[I+1] - x_u[i]) / mu[I][J];
+                  twy[I][J]     = mu[I][J]*0.5*(v[I][j]+v[I][j+1])/(x[I] - x_u[i]);
+                  xplus3[I][J]  = sqrt(rho[I][J] * fabs(twy[I][J])) * (x[I] - x_u[i]) / mu[I][J];
                   xplus[I][J]   = yplus3[I][J];
                   vplus[I][J]   = yplus[I][J];
             }/* if */
             else {
-                  twy[I][J]      = rho[I][J]*pow(Cmu,0.25)*sqrt(k[I][J])*0.5*(v[I][j]+u[I+1][j])/vplus[I][J];
-                  xplus3[I][J]  = sqrt(rho[I][J] * fabs(twy[I][J])) * (x[I+1] - x_u[i]) / mu[I][J];
+                  twy[I][J]      = rho[I][J]*pow(Cmu,0.25)*sqrt(k[I][J])*0.5*(v[I][j]+v[I][j+1])/vplus[I][J];
+                  xplus3[I][J]  = sqrt(rho[I][J] * fabs(twy[I][J])) * (x[I] - x_u[i]) / mu[I][J];
                   xplus [I][J]  = yplus3[I][J];
                   vplus [I][J]  = log(ERough*xplus[I][J])/kappa;
             }/* else */
@@ -1351,8 +1351,20 @@ void output(void)
 			             x[I], y[J], Fsx, Fsy);
 			}
 		
-			else if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+2) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
+			else if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
 				Fsx = twx[I][J]*(XMAX/NPI);
+				Fsy = twy[I][J]*(YMAX/NPJ);
+				fprintf(Fs, "%11.5e\t%11.5e\t%11.5e\t%11.5e\n",
+			             x[I], y[J], Fsx, Fsy);
+			}
+			
+			else if (i == b_ship + count1 && J == 0.5*NPJ){
+				Fsy = twy[I][J]*(YMAX/NPJ);
+				fprintf(Fs, "%11.5e\t%11.5e\t%11.5e\t%11.5e\n",
+			             x[I], y[J], Fsx, Fsy);
+			}
+			
+			else if (i == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2+1) && J <= 0.5*NPJ + (count2+1)){
 				Fsy = twy[I][J]*(YMAX/NPJ);
 				fprintf(Fs, "%11.5e\t%11.5e\t%11.5e\t%11.5e\n",
 			             x[I], y[J], Fsx, Fsy);
