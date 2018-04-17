@@ -1057,11 +1057,13 @@ void epscoeff(double **aE, double **aW, double **aN, double **aS, double **aP, d
 			} 
 			*/
 			
+			/* triangular front part boundaries ship */
 			if (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
 				SP[I][J] = -LARGE;
 				Su[I][J] = pow(Cmu,0.75)*pow(k[I][J],1.5)/(kappa*0.5*AREAw)*LARGE;
 			}
-		
+			
+			/* rectangle part boundaries ship */
 			else if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+2) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
 				SP[I][J] = -LARGE;
 				Su[I][J] = pow(Cmu,0.75)*pow(k[I][J],1.5)/(kappa*0.5*AREAw)*LARGE;
@@ -1173,14 +1175,23 @@ void kcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			} 
 			*/
 			//einde
+			
+			/* diagonal boundary ship --> KLOPT NOG NIET!!!!!!! wat te doen met Su_x of Su_y? of twx twy? */
 			if (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
 				SP[I][J] = -rho[I][J] * pow(Cmu,0.75) * sqrt(k[I][J]) * uplus[I][J]/(0.5*AREAw) * AREAs * AREAw;
 				Su[I][J] = twx[I][J] * 0.5 * (u[i][J] + u[i+1][J])/(0.5*AREAw) * AREAs * AREAw;
 			}
-		
+			
+			/* upper and lower boundaries ship */
 			else if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+2) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
 				SP[I][J] = -rho[I][J] * pow(Cmu,0.75) * sqrt(k[I][J]) * uplus[I][J]/(0.5*AREAw) * AREAs * AREAw;
 				Su[I][J] = twx[I][J] * 0.5 * (u[i][J] + u[i+1][J])/(0.5*AREAw) * AREAs * AREAw;
+			}
+            
+            /* back and first point vertical boundaries ship */
+            else if ((I == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2) && J <= 0.5*NPJ + (count2)) || (I == b_ship + count1 && J == 0.5*NPJ)){
+				SP[I][J] = -rho[I][J] * pow(Cmu,0.75) * sqrt(k[I][J]) * vplus[I][J]/(0.5*AREAw) * AREAs * AREAw;
+				Su[I][J] = twy[I][J] * 0.5 * (v[i][J] + v[i+1][J])/(0.5*AREAw) * AREAs * AREAw;
 			}
             
             else{
@@ -1193,8 +1204,8 @@ void kcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 
 			/* The coefficients (hybrid differencing sheme) */
 
-			aW[I][J] = max3( Fw, Dw + 0.5*Fw, 0.);
-			aE[I][J] = max3(-Fe, De - 0.5*Fe, 0.);
+			//aW[I][J] = max3( Fw, Dw + 0.5*Fw, 0.);
+			//aE[I][J] = max3(-Fe, De - 0.5*Fe, 0.);
             
             // uitzetten zonder wall
             /*
@@ -1206,10 +1217,54 @@ void kcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			*/
 			//einde
 			
-			aS[i][J] = max3( Fs, Ds + 0.5*Fs, 0.); //uitzetten met wall
-            aN[i][J] = max3(-Fn, Dn - 0.5*Fn, 0.);  //uitzetten met wall
+			            // uitzetten zonder wall
+
+
+			/* upper diagonal boundary begin ship  */
+			if (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ + (count2+1))){
+				aS[i][J] = 0;
+				aE[i][J] = 0;	
+			}
             
-            
+            /* lower diagonal boundary begin ship  */
+			if (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) )){
+				aN[i][J] = 0;
+				aE[i][J] = 0;	
+			}
+			            
+            /* lower horizontal boundary ship */
+            if (I > b_ship + (countmax+1) && I <= b_ship + (countmax+2) + l_ship  && (J == 0.5*NPJ - (count2+1) )){
+				aN[i][J] = 0;
+			}
+			/* upper horizontal boundary ship */
+			else if (I > b_ship + (countmax+1) && I <= b_ship + (countmax+2) + l_ship  && (J == 0.5*NPJ + (count2+1))){
+				aS[i][J] = 0;
+			}
+
+			/* begin vertical boundary ship */
+			else if (I == b_ship + count1 && J == 0.5*NPJ){
+				aE[i][J] = 0;
+			}			
+			
+			/* end vertical boundary ship */
+			else if (I == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2) && J <= 0.5*NPJ + (count2)){
+				aW[i][J] = 0;
+			}
+			
+			else {
+			    aS[i][J] = max3( Fs, Ds + 0.5*Fs, 0.);
+			    aN[i][J] = max3(-Fn, Dn - 0.5*Fn, 0.); 
+            	aW[I][j] = max3( Fw, Dw + 0.5*Fw, 0.);
+				aE[I][j] = max3(-Fe, De - 0.5*Fe, 0.);
+			}
+			
+		
+			//einde
+			
+			/*Hieronder moet nog wat mee gedaan worden! else statement?*/
+			//aS[i][J] = max3( Fs, Ds + 0.5*Fs, 0.); //uitzetten met wall
+            //aN[i][J] = max3(-Fn, Dn - 0.5*Fn, 0.);  //uitzetten met wall
+                        
             aPold    = rho[I][J]*AREAe*AREAn/Dt;
 
 			/* eq. 8.31 with time dependent terms (see also eq. 5.14): */
@@ -1416,30 +1471,28 @@ void output(void)
 		i = I;
 		for (J = 1; J <= NPJ+1; J++) {
 			j = J;
-			if (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
+			
+			/* diagonal points boundary nose ship */
+			if (I > b_ship + count1 && I <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
 				Fsx = twx[I][J]*(XMAX/NPI);
 				Fsy = twy[I][J]*(YMAX/NPJ);
-				fprintf(Fs, "%11.5e\t%11.5e\t%11.5e\t%11.5e\n",
-			             x[I], y[J], Fsx, Fsy);
 			}
-		
-			else if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
+			
+			/* points horizontal boundary barges ship */
+			else if (I > b_ship + (countmax+1) && I <= b_ship + (countmax+1) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
 				Fsx = twx[I][J]*(XMAX/NPI);
 //				Fsy = twy[I][J]*(YMAX/NPJ);
-				fprintf(Fs, "%11.5e\t%11.5e\t%11.5e\t%11.5e\n",
-			             x[I], y[J], Fsx, Fsy);
+
 			}
 			
-			else if (i == b_ship + count1 && J == 0.5*NPJ){
+			/*  startpoint boundary nose ship */
+			else if (I == b_ship + count1 && J == 0.5*NPJ){
 				Fsy = twy[I][J]*(YMAX/NPJ);
-				fprintf(Fs, "%11.5e\t%11.5e\t%11.5e\t%11.5e\n",
-			             x[I], y[J], Fsx, Fsy);
 			}
 			
-			else if (i == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2) && J <= 0.5*NPJ + (count2)){
+			/* points vertical boundary end ship */
+			else if (I == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2) && J <= 0.5*NPJ + (count2)){
 				Fsy = twy[I][J]*(YMAX/NPJ);
-				fprintf(Fs, "%11.5e\t%11.5e\t%11.5e\t%11.5e\n",
-			             x[I], y[J], Fsx, Fsy);
 			}
 			
 			else{
@@ -1447,6 +1500,9 @@ void output(void)
 				Fsy = 0.;
 			}
 			
+			fprintf(Fs, "%11.5e\t%11.5e\t%11.5e\t%11.5e\n",
+			        x[I], y[J], Fsx, Fsy);
+			        
 		} /* for J */
 		
 		if (i > b_ship + count1 && i <= b_ship + (count1+1) && count1<=countmax)
