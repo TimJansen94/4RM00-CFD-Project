@@ -1169,14 +1169,14 @@ void calculateuplus(void)
 	    for(J = 0; J <= NPJ; J++){
 			j = J;
 			if (yplus3[I][J] < 11.63) {
-                  tw[I][J]      = mu[I][J]*0.5*(u[i][J]+u[i+1][J])/(y[J+1] -y [j]);
+                  tw[I][J]      = mu[I][J]*0.5*(u[i][J]+u[i+1][J])/(y[J+1] -y_v[j]);
                   yplus3[I][J]  = sqrt(rho[I][J] * fabs(tw[I][J])) * (y[J+1] - y[j]) / mu[I][J];
                   yplus[I][J]   = yplus3[I][J];
                   uplus[I][J]   = yplus[I][J];
             }/* if */
             else {
                   tw[I][J]      = rho[I][J]*pow(Cmu,0.25)*sqrt(k[I][J])*0.5*(u[i][J]+u[i+1][J])/uplus[I][J];
-                  yplus3[I][J]  = sqrt(rho[I][J] * fabs(tw[I][J])) * (y[J+1] - y[j]) / mu[I][J];
+                  yplus3[I][J]  = sqrt(rho[I][J] * fabs(tw[I][J])) * (y[J+1] - y_v[j]) / mu[I][J];
                   yplus [I][J]  = yplus3[I][J];
                   uplus [I][J]  = log(ERough*yplus[I][J])/kappa;
             }/* else */
@@ -1222,7 +1222,7 @@ void output(void)
 /***** Purpose: Creating result table ******/
 	int    I, J, i, j;
 	double ugrid, vgrid,stream,vorticity, Fs;
-	FILE   *fp, *str, *velu, *velv, *vort;
+	FILE   *fp, *str, *velu, *velv, *vort, *Fsx;
 
 /* Plot all results in output.dat */
 
@@ -1307,6 +1307,39 @@ void output(void)
 	} /* for I */
 
 	fclose(velv);
+	
+	/* Plot Fs_x components around ship in Fsx.dat */
+	int    count1, count2;
+	count1 = count;
+	count2 = count1*r_x_y;
+	
+	Fsx = fopen("Fsx.dat", "w");
+
+	for (I = 0; I <= NPI+1; I++) {
+		i = I;
+		for (J = 1; J <= NPJ+1; J++) {
+			j = J;
+			if (i > b_ship + count1 && i <= b_ship + (count1+1) && J >= 0.5*NPJ - count2 && J <= 0.5*NPJ + count2)
+				Fs = tw[I][J]*(XMAX/NPI);
+				fprintf(Fsx, "%11.5e\t%11.5e\t%11.5e\n",
+			             x[I], y_v[j], Fs);
+			
+			if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && J >= 0.5*NPJ - count2 && J <= 0.5*NPJ + count2 )
+				Fs = tw[I][J]*(XMAX/NPI);
+				fprintf(Fsx, "%11.5e\t%11.5e\t%11.5e\n",
+			             x[I], y_v[j], Fs);
+			
+		if (i > b_ship + count1 && i <= b_ship + (count1+1) && count1<=countmax)
+			count1++;
+			count2 = count1*r_x_y;	
+			
+			
+			
+		} /* for J */
+		fprintf(Fsx, "\n");
+	} /* for I */
+
+	
 
 } /* output */
 
