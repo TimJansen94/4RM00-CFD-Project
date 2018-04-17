@@ -1244,7 +1244,7 @@ void output(void)
 /***** Purpose: Creating result table ******/
 	int    I, J, i, j;
 	double ugrid, vgrid,stream,vorticity, Fsx, Fsy;
-	FILE   *fp, *str, *velu, *velv, *vort, *Fsx;
+	FILE   *fp, *str, *velu, *velv, *vort, *Fs;
 
 /* Plot all results in output.dat */
 	fp = fopen("output.dat", "w");
@@ -1335,7 +1335,7 @@ void output(void)
 	count1 = count;
 	count2 = count1*r_x_y;
 	
-	Fsx = fopen("Fsx.dat", "w");
+	Fsx = fopen("Fs.dat", "w");
 
 	for (I = 0; I <= NPI+1; I++) {
 		i = I;
@@ -1361,7 +1361,7 @@ void output(void)
 		fprintf(Fsx, "\n");
 	} /* for I */
 
-	
+	fclose(Fs);
 
 } /* output */
 
