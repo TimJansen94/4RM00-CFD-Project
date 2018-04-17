@@ -27,7 +27,11 @@ double **yplus;
 double **yplus1;
 double **yplus2;
 double **yplus3;
-double **tw;
+double **vplus;
+double **xplus;
+double **xplus3;
+double **twx;
+double **twy;
 
 double **u_old;
 double **v_old;

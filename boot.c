@@ -167,12 +167,19 @@ void init(void)
 			T      [I][J] = 273.;     /* Temperature */
 			k      [I][J] = 1e-3;     /* k */
 			eps    [I][J] = 1e-4;     /* epsilon */
+			
 			uplus  [I][J] = 1.;                                            /* uplus */
 //			yplus1 [I][J] = sqrt(rho[I][J] * u[I][J] / mu[I][J]) * (y[1] - y[0]);   /* yplus1 */
 //			yplus2 [I][J] = sqrt(rho[I][J] * u[I][J] / mu[I][J]) * (y[NPJ+1] - y[NPJ]);   /* yplus2 */
 			yplus3 [I][J] = sqrt(rho[I][J] * u[I][J] / mu[I][J]) * (y[J+1] - y[j]);   /* yplus3 */
 			yplus  [I][J] = 1.;                                            /* yplus*/
-			tw     [I][J] = 5.;                                                /* tw */
+			
+			vplus  [I][J] = 1.;				/* vplus */
+			xplus3 [I][J] = sqrt(rho[I][J] * v[I][J] / mu[I][J]) * (x[I+1] - x[i]);				/*xplus3 */
+			xplus  [I][J] = 1.;			/* xplus */ 
+			
+			twx    [I][J] = 5.;                                                /* tw */
+			twy    [I][J] = 5.;                                                /* tw */
 			rho    [I][J] = 1.0;      /* Density */
 			mu     [I][J] = 2.E-5;    /* Viscosity */
 			Cp     [I][J] = 1013.;     /* J/(K*kg) Heat capacity - assumed constant for this problem */
@@ -332,7 +339,7 @@ void solve(double **fi, double **b, double **aE, double **aW, double **aN, doubl
 	/* ALFA = aE[I][J] Def. in eq. 7.2 */
 	/* A    = Ari[I]	 Def. in eq. 7.6b */
 	/* C    = Cri	 The right side assumed temporarily known (see eq. 7.8) */
-	/* C´   = Cmri[I]  Def. in eq. 7.6c */
+	/* CÂ´   = Cmri[I]  Def. in eq. 7.6c */
 	/* b    = b[I][J]	 Def. in eq. 7.7 */
 
 	space = max2((Iend - Istart + 3),(Jend - Jstart + 3));
@@ -383,7 +390,7 @@ void solve(double **fi, double **b, double **aE, double **aW, double **aN, doubl
 	/* ALFA = aN[I][J] Def. in eq. 7.2 */
 	/* A    = Ari[I]	 Def. in eq. 7.6b */
 	/* C    = Cri      The right side assumed temporarily known (see eq. 7.8) */
-	/* C´   = Cmri[I]  Def. in eq. 7.6c */
+	/* CÂ´   = Cmri[I]  Def. in eq. 7.6c */
 	/* b    = b[I][J]	 Def. in eq. 7.7 */
 
 	/* Solving (n-s) lines from the west */
@@ -758,7 +765,7 @@ void pccoeff(double **aE, double **aW, double **aN, double **aS, double **aP, do
 			AREAs = x_u[i+1] - x_u[i]; /* = A[I][j] */
 			AREAn = AREAs;
 
-			/* The constant b´ in eq. 6.32 */
+			/* The constant bÂ´ in eq. 6.32 */
 
 			b[I][J] = F_u[i][J]*AREAw - F_u[i+1][J]*AREAe + F_v[I][j]*AREAs - F_v[I][j+1]*AREAn;
 
@@ -1157,7 +1164,7 @@ void kcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 void calculateuplus(void)
 /* ################################################################# */
 {
-/***** Purpose: Calculate uplus, yplus and tw  ******/
+/***** Purpose: Calculate uplus, yplus, vplus, xplus and tw  ******/
 
 	int    i,j,I, J;
 
@@ -1169,22 +1176,37 @@ void calculateuplus(void)
 	    for(J = 0; J <= NPJ; J++){
 			j = J;
 			if (yplus3[I][J] < 11.63) {
-                  tw[I][J]      = mu[I][J]*0.5*(u[i][J]+u[i+1][J])/(y[J+1] -y_v[j]);
-                  yplus3[I][J]  = sqrt(rho[I][J] * fabs(tw[I][J])) * (y[J+1] - y[j]) / mu[I][J];
+                  twx[I][J]     = mu[I][J]*0.5*(u[i][J]+u[i+1][J])/(y[J+1] -y [j]);
+                  yplus3[I][J]  = sqrt(rho[I][J] * fabs(twx[I][J])) * (y[J+1] - y[j]) / mu[I][J];
                   yplus[I][J]   = yplus3[I][J];
                   uplus[I][J]   = yplus[I][J];
             }/* if */
             else {
-                  tw[I][J]      = rho[I][J]*pow(Cmu,0.25)*sqrt(k[I][J])*0.5*(u[i][J]+u[i+1][J])/uplus[I][J];
-                  yplus3[I][J]  = sqrt(rho[I][J] * fabs(tw[I][J])) * (y[J+1] - y_v[j]) / mu[I][J];
+                  twx[I][J]     = rho[I][J]*pow(Cmu,0.25)*sqrt(k[I][J])*0.5*(u[i][J]+u[i+1][J])/uplus[I][J];
+                  yplus3[I][J]  = sqrt(rho[I][J] * fabs(twx[I][J])) * (y[J+1] - y[j]) / mu[I][J];
                   yplus [I][J]  = yplus3[I][J];
                   uplus [I][J]  = log(ERough*yplus[I][J])/kappa;
             }/* else */
             
+            //for xplus and vplus calulation
+            if (xplus3[I][J] < 11.63) {
+                  twy[I][J]     = mu[I][J]*0.5*(v[I][j]+v[I+1][j])/(x[I+1] - x [i]);
+                  xplus3[I][J]  = sqrt(rho[I][J] * fabs(twy[I][J])) * (x[I+1] - x[i]) / mu[I][J];
+                  xplus[I][J]   = yplus3[I][J];
+                  vplus[I][J]   = yplus[I][J];
+            }/* if */
+            else {
+                  twy[I][J]      = rho[I][J]*pow(Cmu,0.25)*sqrt(k[I][J])*0.5*(v[I][j]+u[I+1][j])/vplus[I][J];
+                  xplus3[I][J]  = sqrt(rho[I][J] * fabs(twy[I][J])) * (x[I+1] - x[i]) / mu[I][J];
+                  xplus [I][J]  = yplus3[I][J];
+                  vplus [I][J]  = log(ERough*xplus[I][J])/kappa;
+            }/* else */
+			
+            
                   
         } /* for J */
     } /* for I */
-} /* cuplus */
+} /* cuvplus */
 
 /* ################################################################# */
 void viscosity(void)
@@ -1221,11 +1243,10 @@ void output(void)
 {
 /***** Purpose: Creating result table ******/
 	int    I, J, i, j;
-	double ugrid, vgrid,stream,vorticity, Fs;
+	double ugrid, vgrid,stream,vorticity, Fsx, Fsy;
 	FILE   *fp, *str, *velu, *velv, *vort, *Fsx;
 
 /* Plot all results in output.dat */
-
 	fp = fopen("output.dat", "w");
 
 	for (I = 0; I <= NPI; I++) {
@@ -1234,10 +1255,11 @@ void output(void)
 			j = J;
 			ugrid = 0.5*(u[i][J]+u[i+1][J  ]);
 			vgrid = 0.5*(v[I][j]+v[I  ][j+1]);
-			Fs = tw[I][J]*(XMAX/NPI);
-			fprintf(fp, "%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\n",
-			             x[I], y[J], ugrid, vgrid, p[I][J], T[I][J], rho[I][J], mu[I][J], Gamma[I][J], k[I][J], eps[I][J], uplus[I][J], yplus[I][J], yplus1[I][J], yplus2[I][J], yplus3[I][J], tw[I][J], Fs);
-//			             1     2     3      4      5        6        7          8         9            10       11         12           13           14            15			 16			   17		 18
+			Fsx = twx[I][J]*(XMAX/NPI);
+			Fsy = twy[I][J]*(YMAX/NPJ);
+			fprintf(fp, "%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e\t%11.5e%11.5e\t%11.5e\t%11.5e\n",
+			             x[I], y[J], ugrid, vgrid, p[I][J], T[I][J], rho[I][J], mu[I][J], Gamma[I][J], k[I][J], eps[I][J], uplus[I][J], yplus[I][J], yplus1[I][J], yplus2[I][J], yplus3[I][J], twx[I][J], Fsx, vplus[I][J], xplus[I][J], xplus3[I][J], twy[I][J], Fsy);
+//			             1     2     3      4      5        6        7          8         9            10       11         12           13           14            15			 16			   17		 18	 19			  20		   21
 		} /* for J */
 		fprintf(fp, "\n");
 	} /* for I */
@@ -1415,7 +1437,12 @@ void memalloc(void)
 	yplus2 = double_2D_matrix(NPI + 2, NPJ + 2);
 	yplus3 = double_2D_matrix(NPI + 2, NPJ + 2);
 	uplus  = double_2D_matrix(NPI + 2, NPJ + 2);
-	tw     = double_2D_matrix(NPI + 2, NPJ + 2);
+	xplus  = double_2D_matrix(NPI + 2, NPJ + 2);
+	xplus3 = double_2D_matrix(NPI + 2, NPJ + 2);	
+	vplus  = double_2D_matrix(NPI + 2, NPJ + 2);
+	twx    = double_2D_matrix(NPI + 2, NPJ + 2);
+	twy    = double_2D_matrix(NPI + 2, NPJ + 2);
+
 
 	u_old  = double_2D_matrix(NPI + 2, NPJ + 2);
 	v_old  = double_2D_matrix(NPI + 2, NPJ + 2);
