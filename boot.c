@@ -532,8 +532,19 @@ void ucoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			mus = 0.25*(mueff[I][J] + mueff[I-1][J] + mueff[I][J-1] + mueff[I-1][J-1]);
 			mun = 0.25*(mueff[I][J] + mueff[I-1][J] + mueff[I][J+1] + mueff[I-1][J+1]);
 			
+			/* walls at the diagonals begin and upper and lower edges of the ship */
+			if( (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))) || 
+				(i > b_ship + (countmax+2) && i <= b_ship + (countmax+1) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))) )
+				/* setting source terms by comparing y+<11.63 */
+				if(yplus[I][J] < 11.63)
+					SP[i][J]= -mu[I][J]*AREAs/(0.5*AREAw);
+				else
+					SP[i][J]=-rho[I][J] * pow(Cmu, 0.25) * sqrt(k[I][J]) / uplus[I][J] * AREAs;
+			else
+				SP[i][J] = 0.;
+				
 // uitzetten zonder walls 
-
+/*
 			if( (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))) || 
 				(i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))) )
 				if(yplus[I][J] < 11.63)
@@ -542,8 +553,9 @@ void ucoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 					SP[i][J]=-rho[I][J] * pow(Cmu, 0.25) * sqrt(k[I][J]) / uplus[I][J] * AREAs;
 			else
 				SP[i][J] = 0.; 
-				
+*/
 			//SP[i][J] = 0.; //aanzetten zonder walls
+
             
 			Su[i][J] = (mueff[I][J]*dudx[I][J] - mueff[I-1][J]*dudx[I-1][J]) / (x[I] - x[I-1]) + 
 			           (mun        *dvdx[i][j+1] - mus        *dvdx[i][j]) / (y_v[j+1] - y_v[j]) -
@@ -567,7 +579,7 @@ void ucoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			aE[i][J] = max3(-Fe, De - 0.5*Fe, 0.);
 
 // uitzetten zonder walls
-
+/*
 			if ( (i > b_ship + count1 && i <= b_ship + (count1+1) && J == 0.5*NPJ + (count2+1)) || 
 				(i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && J == 0.5*NPJ + (count2+1)) ) 
 				aS[i][J]=0.;
@@ -579,8 +591,20 @@ void ucoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 				aN[i][J] =0.;
 			else        
 				aN[i][J] = max3(-Fn, Dn - 0.5*Fn, 0.); 
-			
-			
+			*/
+
+			if ( (i == b_ship + (count1) && J == 0.5*NPJ + (count2+1)) || 
+				(i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && J == 0.5*NPJ + (count2+1)) ) 
+				aS[i][J]=0.;
+			else      
+				aS[i][J] = max3( Fs, Ds + 0.5*Fs, 0.);
+            
+			if ( (i == b_ship + (count1) && J == 0.5*NPJ - (count2+1))  || 
+				(i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && J == 0.5*NPJ - (count2+1))  ) 
+				aN[i][J] =0.;
+			else        
+				aN[i][J] = max3(-Fn, Dn - 0.5*Fn, 0.); 
+
 			// aanzetten zonder walls 
 			/*
 			aS[i][J] = max3( Fs, Ds + 0.5*Fs, 0.);
@@ -679,17 +703,22 @@ void vcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			muw = 0.25*(mueff[I][J] + mueff[I-1][J] + mueff[I][J-1] + mueff[I-1][J-1]);
 			mue = 0.25*(mueff[I][J] + mueff[I+1][J] + mueff[I][J-1] + mueff[I+1][J-1]);
 			
-			
+/*	
 			if( (I > b_ship + count1 && I <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))) || 
 				(I == b_ship + count1 && J == 0.5*NPJ) ||
 				(i == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2+1) && J <= 0.5*NPJ + (count2+1)) )
+*/
+
+			if( (I > b_ship + count1 && I <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))) || 
+				(I == b_ship + count1 && J == 0.5*NPJ) ||
+				(I == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2+1) && J <= 0.5*NPJ + (count2+1)) )
 				if(xplus[I][J] < 11.63)
 					SP[I][j]= -mu[I][J]*AREAw/(0.5*AREAs);
 				else
 					SP[I][j]=-rho[I][J] * pow(Cmu, 0.25) * sqrt(k[I][J]) / vplus[I][J] * AREAw;
 			else
 				SP[I][j] = 0.; 
-			
+
 			
 			Su[I][j] = (mueff[I][J]*dvdy[I][J] - mueff[I][J-1]*dvdy[I][J-1])/(y[J] - y[J-1]) + 
 			           (mue*dudy[i+1][j] - muw*dudy[i][j])/(x_u[i+1] - x_u[i]) - 
@@ -710,7 +739,6 @@ void vcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 				
 
 			/* The coefficients (hybrid differencing scheme) */
-
 			//aW[I][j] = max3( Fw, Dw + 0.5*Fw, 0.);
 			//aE[I][j] = max3(-Fe, De - 0.5*Fe, 0.);
 			aS[I][j] = max3( Fs, Ds + 0.5*Fs, 0.);
@@ -718,16 +746,18 @@ void vcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			
 			
 			if ( (I == b_ship + (countmax+2) + l_ship && j >= 0.5*NPJ - (count2) && j <= 0.5*NPJ + (count2)) ) 
-				aW[I][j]=0.;
+				aW[I][j] = 0.;
 			else      
 				aW[I][j] = max3( Fs, Ds + 0.5*Fs, 0.);
             
-			if ( (I > b_ship + count1 && I <= b_ship + (count1+1) && (j == 0.5*NPJ - (count2+1) || j == 0.5*NPJ + (count2+1))) ||
+			if ( (I == b_ship + (count1) && (j == 0.5*NPJ - (count2+1) || j == 0.5*NPJ + (count2+1))) ||
 				(I == b_ship + count1 && j == 0.5*NPJ) ) 
 				aE[I][j] =0.;
 			else        
-				aE[I][j] = max3(-Fn, Dn - 0.5*Fn, 0.); 
+				aE[I][j] = max3(-Fn, Dn - 0.5*Fn, 0.);
 				
+			
+			
 			
 			aPold    = 0.5*(rho[I][J-1] + rho[I][J])*AREAe*AREAn/Dt;
 
@@ -1058,16 +1088,24 @@ void epscoeff(double **aE, double **aW, double **aN, double **aS, double **aP, d
 			*/
 			
 			/* triangular front part boundaries ship */
-			if (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
+			// misschien ook de AREAs meenemen???
+			if ( I > b_ship + count1 && I <= b_ship + (count1+1) && count1 <= countmax && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1)) ){
 				SP[I][J] = -LARGE;
-				Su[I][J] = pow(Cmu,0.75)*pow(k[I][J],1.5)/(kappa*0.5*AREAw)*LARGE;
+				Su[I][J] = pow(Cmu,0.75)*pow(k[I][J],1.5)/(kappa*0.5*AREAw)*LARGE + pow(Cmu,0.75)*pow(k[I][J],1.5)/(kappa*0.5*AREAs)*LARGE ;
 			}
 			
-			/* rectangle part boundaries ship */
-			else if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+2) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
+			/* upper and lower boundaries part boundaries ship */
+			else if (I > b_ship + (countmax+2) && I <= b_ship + (countmax+1) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
 				SP[I][J] = -LARGE;
 				Su[I][J] = pow(Cmu,0.75)*pow(k[I][J],1.5)/(kappa*0.5*AREAw)*LARGE;
 			}
+            
+            /* back and first point vertical boundaries ship */
+            else if ( (I == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2) && J <= 0.5*NPJ + (count2)) || (I == b_ship + count1 && J == 0.5*NPJ) ){
+				SP[I][J] = -LARGE;
+				Su[I][J] = pow(Cmu,0.75)*pow(k[I][J],1.5)/(kappa*0.5*AREAw)*LARGE; //eigenlijk AREAs maar werkt niet
+			}
+            
             
             else{
             	Su[I][J] = C1eps * eps[I][J] / k[I][J] * 2. * mut[I][J] * E2[I][J]; //uitzetten met wall
@@ -1078,11 +1116,13 @@ void epscoeff(double **aE, double **aW, double **aN, double **aS, double **aP, d
 			SP[I][J] *= AREAw*AREAs;
 
 			/* The coefficients (hybrid differencing sheme) */
-
+			// op 0 zetten buiten het schip? dit werkt niet als je dit doet....
 			aW[I][J] = max3( Fw, Dw + 0.5*Fw, 0.);
 			aE[I][J] = max3(-Fe, De - 0.5*Fe, 0.);
 			aS[I][J] = max3( Fs, Ds + 0.5*Fs, 0.);
 			aN[I][J] = max3(-Fn, Dn - 0.5*Fn, 0.);
+			
+						
 			aPold    = rho[I][J]*AREAe*AREAn/Dt;
 
 			/* eq. 8.31 with time dependent terms (see also eq. 5.14): */
@@ -1110,7 +1150,7 @@ void epscoeff(double **aE, double **aW, double **aN, double **aS, double **aP, d
 void kcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, double **b)
 /* ################################################################# */
 {
-/***** Purpose: Calculate the epsilon *****/
+/***** Purpose: Calculate the k *****/
 /*****           *****/
 	int    i, j, I, J;
 	double Fw, Fe, Fs, Fn, 
@@ -1178,20 +1218,20 @@ void kcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			
 			/* diagonal boundary ship --> KLOPT NOG NIET!!!!!!! wat te doen met Su_x of Su_y? of twx twy? */
 			if (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
-				SP[I][J] = -rho[I][J] * pow(Cmu,0.75) * sqrt(k[I][J]) * uplus[I][J]/(0.5*AREAw) * AREAs * AREAw;
-				Su[I][J] = twx[I][J] * 0.5 * (u[i][J] + u[i+1][J])/(0.5*AREAw) * AREAs * AREAw;
+				SP[I][J] = -rho[I][J] * pow(Cmu,0.75) * sqrt(k[I][J]) * uplus[I][J]/(0.5*AREAw) * AREAs * AREAw + -rho[I][J] * pow(Cmu,0.75) * sqrt(k[I][J]) * uplus[I][J]/(0.5*AREAw) * AREAs * AREAw;
+				Su[I][J] = twx[I][J] * 0.5 * (u[i][J] + u[i+1][J])/(0.5*AREAw) * AREAs * AREAw + twy[I][J] * 0.5 * (v[I][j] + v[I][j+1])/(0.5*AREAs) * AREAs * AREAw;
 			}
 			
 			/* upper and lower boundaries ship */
-			else if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+2) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
+			else if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
 				SP[I][J] = -rho[I][J] * pow(Cmu,0.75) * sqrt(k[I][J]) * uplus[I][J]/(0.5*AREAw) * AREAs * AREAw;
 				Su[I][J] = twx[I][J] * 0.5 * (u[i][J] + u[i+1][J])/(0.5*AREAw) * AREAs * AREAw;
 			}
             
             /* back and first point vertical boundaries ship */
-            else if ((I == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2) && J <= 0.5*NPJ + (count2)) || (I == b_ship + count1 && J == 0.5*NPJ)){
-				SP[I][J] = -rho[I][J] * pow(Cmu,0.75) * sqrt(k[I][J]) * vplus[I][J]/(0.5*AREAw) * AREAs * AREAw;
-				Su[I][J] = twy[I][J] * 0.5 * (v[i][J] + v[i+1][J])/(0.5*AREAw) * AREAs * AREAw;
+            else if ( (I == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2) && J <= 0.5*NPJ + (count2)) || (I == b_ship + count1 && J == 0.5*NPJ) ){
+				SP[I][J] = -rho[I][J] * pow(Cmu,0.75) * sqrt(k[I][J]) * vplus[I][J]/(0.5*AREAs) * AREAs * AREAw;
+				Su[I][J] = twy[I][J] * 0.5 * (v[I][j] + v[I][j+1])/(0.5*AREAs) * AREAs * AREAw;
 			}
             
             else{
@@ -1222,33 +1262,33 @@ void kcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 
 			/* upper diagonal boundary begin ship  */
 			if (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ + (count2+1))){
-				aS[i][J] = 0;
-				aE[i][J] = 0;	
+				aS[i][J] = 0.;
+				aE[i][J] = 0.;	
 			}
             
             /* lower diagonal boundary begin ship  */
 			if (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) )){
-				aN[i][J] = 0;
-				aE[i][J] = 0;	
+				aN[i][J] = 0.;
+				aE[i][J] = 0.;	
 			}
 			            
             /* lower horizontal boundary ship */
-            if (I > b_ship + (countmax+1) && I <= b_ship + (countmax+2) + l_ship  && (J == 0.5*NPJ - (count2+1) )){
-				aN[i][J] = 0;
+            if (I > b_ship + (countmax+1) && I <= b_ship + (countmax+2) + l_ship && (J == 0.5*NPJ - (count2+1) )){
+				aN[i][J] = 0.;
 			}
 			/* upper horizontal boundary ship */
-			else if (I > b_ship + (countmax+1) && I <= b_ship + (countmax+2) + l_ship  && (J == 0.5*NPJ + (count2+1))){
-				aS[i][J] = 0;
+			else if (I > b_ship + (countmax+1) && I <= b_ship + (countmax+2) + l_ship && (J == 0.5*NPJ + (count2+1))){
+				aS[i][J] = 0.;
 			}
 
 			/* begin vertical boundary ship */
 			else if (I == b_ship + count1 && J == 0.5*NPJ){
-				aE[i][J] = 0;
+				aE[i][J] = 0.;
 			}			
 			
 			/* end vertical boundary ship */
 			else if (I == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2) && J <= 0.5*NPJ + (count2)){
-				aW[i][J] = 0;
+				aW[i][J] = 0.;
 			}
 			
 			else {
