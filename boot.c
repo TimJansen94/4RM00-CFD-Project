@@ -1244,7 +1244,7 @@ void output(void)
 /***** Purpose: Creating result table ******/
 	int    I, J, i, j;
 	double ugrid, vgrid,stream,vorticity, Fsx, Fsy;
-	FILE   *fp, *str, *velu, *velv, *vort;
+	FILE   *fp, *str, *velu, *velv, *vort, *Fsx;
 
 /* Plot all results in output.dat */
 
@@ -1330,6 +1330,39 @@ void output(void)
 	} /* for I */
 
 	fclose(velv);
+	
+	/* Plot Fs_x components around ship in Fsx.dat */
+	int    count1, count2;
+	count1 = count;
+	count2 = count1*r_x_y;
+	
+	Fsx = fopen("Fsx.dat", "w");
+
+	for (I = 0; I <= NPI+1; I++) {
+		i = I;
+		for (J = 1; J <= NPJ+1; J++) {
+			j = J;
+			if (i > b_ship + count1 && i <= b_ship + (count1+1) && J >= 0.5*NPJ - count2 && J <= 0.5*NPJ + count2)
+				Fs = tw[I][J]*(XMAX/NPI);
+				fprintf(Fsx, "%11.5e\t%11.5e\t%11.5e\n",
+			             x[I], y_v[j], Fs);
+			
+			if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && J >= 0.5*NPJ - count2 && J <= 0.5*NPJ + count2 )
+				Fs = tw[I][J]*(XMAX/NPI);
+				fprintf(Fsx, "%11.5e\t%11.5e\t%11.5e\n",
+			             x[I], y_v[j], Fs);
+			
+		if (i > b_ship + count1 && i <= b_ship + (count1+1) && count1<=countmax)
+			count1++;
+			count2 = count1*r_x_y;	
+			
+			
+			
+		} /* for J */
+		fprintf(Fsx, "\n");
+	} /* for I */
+
+	
 
 } /* output */
 
