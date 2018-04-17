@@ -533,16 +533,17 @@ void ucoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			mun = 0.25*(mueff[I][J] + mueff[I-1][J] + mueff[I][J+1] + mueff[I-1][J+1]);
 			
 // uitzetten zonder walls 
-/*
-			if(J == 1 || J==NPJ)
+
+			if( (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))) || 
+				(i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))) )
 				if(yplus[I][J] < 11.63)
 					SP[i][J]= -mu[I][J]*AREAs/(0.5*AREAw);
 				else
 					SP[i][J]=-rho[I][J] * pow(Cmu, 0.25) * sqrt(k[I][J]) / uplus[I][J] * AREAs;
 			else
-				SP[i][J] = 0.; */
+				SP[i][J] = 0.; 
 				
-			SP[i][J] = 0.; //aanzetten zonder walls
+			//SP[i][J] = 0.; //aanzetten zonder walls
             
 			Su[i][J] = (mueff[I][J]*dudx[I][J] - mueff[I-1][J]*dudx[I-1][J]) / (x[I] - x[I-1]) + 
 			           (mun        *dvdx[i][j+1] - mus        *dvdx[i][j]) / (y_v[j+1] - y_v[j]) -
@@ -566,17 +567,25 @@ void ucoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			aE[i][J] = max3(-Fe, De - 0.5*Fe, 0.);
 
 // uitzetten zonder walls
-/*
-			if (J==1) aS[i][J]=0.;
-			else      aS[i][J] = max3( Fs, Ds + 0.5*Fs, 0.);
+
+			if ( (i > b_ship + count1 && i <= b_ship + (count1+1) && J == 0.5*NPJ + (count2+1)) || 
+				(i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && J == 0.5*NPJ + (count2+1)) ) 
+				aS[i][J]=0.;
+			else      
+				aS[i][J] = max3( Fs, Ds + 0.5*Fs, 0.);
             
-			if (J==NPJ) aN[i][J] =0.;
-			else        aN[i][J] = max3(-Fn, Dn - 0.5*Fn, 0.); 
-			*/
+			if ( (i > b_ship + count1 && i <= b_ship + (count1+1) && J == 0.5*NPJ - (count2+1))|| 
+				(i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && J == 0.5*NPJ - (count2+1)) ) 
+				aN[i][J] =0.;
+			else        
+				aN[i][J] = max3(-Fn, Dn - 0.5*Fn, 0.); 
 			
-			// aanzetten zonder walls
+			
+			// aanzetten zonder walls 
+			/*
 			aS[i][J] = max3( Fs, Ds + 0.5*Fs, 0.);
             aN[i][J] = max3(-Fn, Dn - 0.5*Fn, 0.); 
+            */
             
 			aPold    = 0.5*(rho[I-1][J] + rho[I][J])*AREAe*AREAn/Dt;
 
@@ -669,7 +678,19 @@ void vcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 
 			muw = 0.25*(mueff[I][J] + mueff[I-1][J] + mueff[I][J-1] + mueff[I-1][J-1]);
 			mue = 0.25*(mueff[I][J] + mueff[I+1][J] + mueff[I][J-1] + mueff[I+1][J-1]);
-			SP[I][j] = 0.;
+			
+			
+			if( (I > b_ship + count1 && I <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))) || 
+				(I == b_ship + count1 && J == 0.5*NPJ) ||
+				(i == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2+1) && J <= 0.5*NPJ + (count2+1)) )
+				if(xplus[I][J] < 11.63)
+					SP[I][j]= -mu[I][J]*AREAw/(0.5*AREAs);
+				else
+					SP[I][j]=-rho[I][J] * pow(Cmu, 0.25) * sqrt(k[I][J]) / vplus[I][J] * AREAw;
+			else
+				SP[I][j] = 0.; 
+			
+			
 			Su[I][j] = (mueff[I][J]*dvdy[I][J] - mueff[I][J-1]*dvdy[I][J-1])/(y[J] - y[J-1]) + 
 			           (mue*dudy[i+1][j] - muw*dudy[i][j])/(x_u[i+1] - x_u[i]) - 
                        2./3. * (rho[I][J]*k[I][J] - rho[I][J-1]*k[I][J-1])/(y[J] - y[J-1]); 
@@ -690,10 +711,24 @@ void vcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 
 			/* The coefficients (hybrid differencing scheme) */
 
-			aW[I][j] = max3( Fw, Dw + 0.5*Fw, 0.);
-			aE[I][j] = max3(-Fe, De - 0.5*Fe, 0.);
+			//aW[I][j] = max3( Fw, Dw + 0.5*Fw, 0.);
+			//aE[I][j] = max3(-Fe, De - 0.5*Fe, 0.);
 			aS[I][j] = max3( Fs, Ds + 0.5*Fs, 0.);
 			aN[I][j] = max3(-Fn, Dn - 0.5*Fn, 0.);
+			
+			
+			if ( (I == b_ship + (countmax+2) + l_ship && j >= 0.5*NPJ - (count2) && j <= 0.5*NPJ + (count2)) ) 
+				aW[I][j]=0.;
+			else      
+				aW[I][j] = max3( Fs, Ds + 0.5*Fs, 0.);
+            
+			if ( (I > b_ship + count1 && I <= b_ship + (count1+1) && (j == 0.5*NPJ - (count2+1) || j == 0.5*NPJ + (count2+1))) ||
+				(I == b_ship + count1 && j == 0.5*NPJ) ) 
+				aE[I][j] =0.;
+			else        
+				aE[I][j] = max3(-Fn, Dn - 0.5*Fn, 0.); 
+				
+			
 			aPold    = 0.5*(rho[I][J-1] + rho[I][J])*AREAe*AREAn/Dt;
 
 			/* eq. 8.31 without time dependent terms (see also eq. 5.14): */
@@ -1390,7 +1425,7 @@ void output(void)
 		
 			else if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
 				Fsx = twx[I][J]*(XMAX/NPI);
-				Fsy = twy[I][J]*(YMAX/NPJ);
+//				Fsy = twy[I][J]*(YMAX/NPJ);
 				fprintf(Fs, "%11.5e\t%11.5e\t%11.5e\t%11.5e\n",
 			             x[I], y[J], Fsx, Fsy);
 			}
@@ -1401,7 +1436,7 @@ void output(void)
 			             x[I], y[J], Fsx, Fsy);
 			}
 			
-			else if (i == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2+1) && J <= 0.5*NPJ + (count2+1)){
+			else if (i == b_ship + (countmax+2) + l_ship && J >= 0.5*NPJ - (count2) && J <= 0.5*NPJ + (count2)){
 				Fsy = twy[I][J]*(YMAX/NPJ);
 				fprintf(Fs, "%11.5e\t%11.5e\t%11.5e\t%11.5e\n",
 			             x[I], y[J], Fsx, Fsy);
