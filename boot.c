@@ -678,7 +678,7 @@ void vcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			
 			
 			/* v can be fixed to zero by setting SP to a very large value */
-			
+
 			if (I > b_ship + count1 && I <= b_ship + (count1+1) && j >= 0.5*NPJ - count2 && j <= 0.5*NPJ + count2)
 				SP[I][j] = -LARGE;
 				
@@ -974,6 +974,10 @@ void epscoeff(double **aE, double **aW, double **aN, double **aS, double **aP, d
 	conv();
     viscosity();
     
+    int    count1, count2;
+	count1 = count;
+	count2 = count1*r_x_y;
+	
 	for (I = Istart; I <= Iend; I++) {
 		i = I;
 		for (J = Jstart; J <= Jend; J++) {
@@ -1018,10 +1022,21 @@ void epscoeff(double **aE, double **aW, double **aN, double **aS, double **aP, d
 			} 
 			*/
 			
-            Su[I][J] = C1eps * eps[I][J] / k[I][J] * 2. * mut[I][J] * E2[I][J]; //uitzetten met wall
-			SP[I][J] = -C2eps * rho[I][J] * eps[I][J] / (k[I][J] + SMALL); //uitzetten met wall
+			if (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
+				SP[I][J] = -LARGE;
+				Su[I][J] = pow(Cmu,0.75)*pow(k[I][J],1.5)/(kappa*0.5*AREAw)*LARGE;
+			}
+		
+			else if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+2) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
+				SP[I][J] = -LARGE;
+				Su[I][J] = pow(Cmu,0.75)*pow(k[I][J],1.5)/(kappa*0.5*AREAw)*LARGE;
+			}
             
-            
+            else{
+            	Su[I][J] = C1eps * eps[I][J] / k[I][J] * 2. * mut[I][J] * E2[I][J]; //uitzetten met wall
+				SP[I][J] = -C2eps * rho[I][J] * eps[I][J] / (k[I][J] + SMALL); //uitzetten met wall
+            }
+			            
 			Su[I][J] *= AREAw*AREAs;
 			SP[I][J] *= AREAw*AREAs;
 
@@ -1045,6 +1060,11 @@ void epscoeff(double **aE, double **aW, double **aN, double **aS, double **aP, d
 			/* This is done in the next step of the main program. */
 
 			} /* for J */
+			
+		if (i > b_ship + count1 && i <= b_ship + (count1+1) && count1<=countmax)
+			count1++;
+			count2 = count1*r_x_y;
+		
 		} /* for I */
 	
 } /*epscoef*/
@@ -1070,6 +1090,10 @@ void kcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
     viscosity();
     calculateuplus();
     
+    int    count1, count2;
+	count1 = count;
+	count2 = count1*r_x_y;
+	
 	for (I = Istart; I <= Iend; I++) {
 		i = I;
 		for (J = Jstart; J <= Jend; J++) {
@@ -1114,13 +1138,21 @@ void kcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			} 
 			*/
 			//einde
-			
-			//uitzetten met wall
-			Su[I][J]  = 2. * mut[I][J] * E2[I][J];
-			SP[I][J]  = -rho[I][J] * eps[I][J] / k[I][J];
-			//einde
-						                      
-								                 
+			if (i > b_ship + count1 && i <= b_ship + (count1+1) && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
+				SP[I][J] = -rho[I][J] * pow(Cmu,0.75) * sqrt(k[I][J]) * uplus[I][J]/(0.5*AREAw) * AREAs * AREAw;
+				Su[I][J] = twx[I][J] * 0.5 * (u[i][J] + u[i+1][J])/(0.5*AREAw) * AREAs * AREAw;
+			}
+		
+			else if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+2) + l_ship  && (J == 0.5*NPJ - (count2+1) || J == 0.5*NPJ + (count2+1))){
+				SP[I][J] = -rho[I][J] * pow(Cmu,0.75) * sqrt(k[I][J]) * uplus[I][J]/(0.5*AREAw) * AREAs * AREAw;
+				Su[I][J] = twx[I][J] * 0.5 * (u[i][J] + u[i+1][J])/(0.5*AREAw) * AREAs * AREAw;
+			}
+            
+            else{
+            	Su[I][J]  = 2. * mut[I][J] * E2[I][J];
+				SP[I][J]  = -rho[I][J] * eps[I][J] / k[I][J];
+            }					                      
+							                 
 			Su[I][j] *= AREAw*AREAs;
 			SP[I][j] *= AREAw*AREAs;
 
@@ -1157,6 +1189,11 @@ void kcoeff(double **aE, double **aW, double **aN, double **aS, double **aP, dou
 			/* This is done in the next step of the main program. */
 
 			} /* for J */
+			
+		if (i > b_ship + count1 && i <= b_ship + (count1+1) && count1<=countmax)
+			count1++;
+			count2 = count1*r_x_y;
+			
 		} /* for I */
 	
 } /*kcoeff*/
