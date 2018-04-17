@@ -339,7 +339,7 @@ void solve(double **fi, double **b, double **aE, double **aW, double **aN, doubl
 	/* ALFA = aE[I][J] Def. in eq. 7.2 */
 	/* A    = Ari[I]	 Def. in eq. 7.6b */
 	/* C    = Cri	 The right side assumed temporarily known (see eq. 7.8) */
-	/* C´   = Cmri[I]  Def. in eq. 7.6c */
+	/* CÂ´   = Cmri[I]  Def. in eq. 7.6c */
 	/* b    = b[I][J]	 Def. in eq. 7.7 */
 
 	space = max2((Iend - Istart + 3),(Jend - Jstart + 3));
@@ -390,7 +390,7 @@ void solve(double **fi, double **b, double **aE, double **aW, double **aN, doubl
 	/* ALFA = aN[I][J] Def. in eq. 7.2 */
 	/* A    = Ari[I]	 Def. in eq. 7.6b */
 	/* C    = Cri      The right side assumed temporarily known (see eq. 7.8) */
-	/* C´   = Cmri[I]  Def. in eq. 7.6c */
+	/* CÂ´   = Cmri[I]  Def. in eq. 7.6c */
 	/* b    = b[I][J]	 Def. in eq. 7.7 */
 
 	/* Solving (n-s) lines from the west */
@@ -765,7 +765,7 @@ void pccoeff(double **aE, double **aW, double **aN, double **aS, double **aP, do
 			AREAs = x_u[i+1] - x_u[i]; /* = A[I][j] */
 			AREAn = AREAs;
 
-			/* The constant b´ in eq. 6.32 */
+			/* The constant bÂ´ in eq. 6.32 */
 
 			b[I][J] = F_u[i][J]*AREAw - F_u[i+1][J]*AREAe + F_v[I][j]*AREAs - F_v[I][j+1]*AREAn;
 
@@ -1244,10 +1244,9 @@ void output(void)
 /***** Purpose: Creating result table ******/
 	int    I, J, i, j;
 	double ugrid, vgrid,stream,vorticity, Fsx, Fsy;
-	FILE   *fp, *str, *velu, *velv, *vort;
+	FILE   *fp, *str, *velu, *velv, *vort, *Fsx;
 
 /* Plot all results in output.dat */
-
 	fp = fopen("output.dat", "w");
 
 	for (I = 0; I <= NPI; I++) {
@@ -1330,6 +1329,39 @@ void output(void)
 	} /* for I */
 
 	fclose(velv);
+	
+	/* Plot Fs_x components around ship in Fsx.dat */
+	int    count1, count2;
+	count1 = count;
+	count2 = count1*r_x_y;
+	
+	Fsx = fopen("Fsx.dat", "w");
+
+	for (I = 0; I <= NPI+1; I++) {
+		i = I;
+		for (J = 1; J <= NPJ+1; J++) {
+			j = J;
+			if (i > b_ship + count1 && i <= b_ship + (count1+1) && J >= 0.5*NPJ - count2 && J <= 0.5*NPJ + count2)
+				Fs = tw[I][J]*(XMAX/NPI);
+				fprintf(Fsx, "%11.5e\t%11.5e\t%11.5e\n",
+			             x[I], y_v[j], Fs);
+			
+			if (i > b_ship + (countmax+1) && i <= b_ship + (countmax+1) + l_ship  && J >= 0.5*NPJ - count2 && J <= 0.5*NPJ + count2 )
+				Fs = tw[I][J]*(XMAX/NPI);
+				fprintf(Fsx, "%11.5e\t%11.5e\t%11.5e\n",
+			             x[I], y_v[j], Fs);
+			
+		if (i > b_ship + count1 && i <= b_ship + (count1+1) && count1<=countmax)
+			count1++;
+			count2 = count1*r_x_y;	
+			
+			
+			
+		} /* for J */
+		fprintf(Fsx, "\n");
+	} /* for I */
+
+	
 
 } /* output */
 
