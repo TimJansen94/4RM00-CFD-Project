@@ -339,7 +339,7 @@ void solve(double **fi, double **b, double **aE, double **aW, double **aN, doubl
 	/* ALFA = aE[I][J] Def. in eq. 7.2 */
 	/* A    = Ari[I]	 Def. in eq. 7.6b */
 	/* C    = Cri	 The right side assumed temporarily known (see eq. 7.8) */
-	/* C´   = Cmri[I]  Def. in eq. 7.6c */
+	/* CÂ´   = Cmri[I]  Def. in eq. 7.6c */
 	/* b    = b[I][J]	 Def. in eq. 7.7 */
 
 	space = max2((Iend - Istart + 3),(Jend - Jstart + 3));
@@ -390,7 +390,7 @@ void solve(double **fi, double **b, double **aE, double **aW, double **aN, doubl
 	/* ALFA = aN[I][J] Def. in eq. 7.2 */
 	/* A    = Ari[I]	 Def. in eq. 7.6b */
 	/* C    = Cri      The right side assumed temporarily known (see eq. 7.8) */
-	/* C´   = Cmri[I]  Def. in eq. 7.6c */
+	/* CÂ´   = Cmri[I]  Def. in eq. 7.6c */
 	/* b    = b[I][J]	 Def. in eq. 7.7 */
 
 	/* Solving (n-s) lines from the west */
@@ -765,7 +765,7 @@ void pccoeff(double **aE, double **aW, double **aN, double **aS, double **aP, do
 			AREAs = x_u[i+1] - x_u[i]; /* = A[I][j] */
 			AREAn = AREAs;
 
-			/* The constant b´ in eq. 6.32 */
+			/* The constant bÂ´ in eq. 6.32 */
 
 			b[I][J] = F_u[i][J]*AREAw - F_u[i+1][J]*AREAe + F_v[I][j]*AREAs - F_v[I][j+1]*AREAn;
 
@@ -1247,7 +1247,6 @@ void output(void)
 	FILE   *fp, *str, *velu, *velv, *vort, *Fsx;
 
 /* Plot all results in output.dat */
-
 	fp = fopen("output.dat", "w");
 
 	for (I = 0; I <= NPI; I++) {
